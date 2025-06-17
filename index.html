@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HDMS API 문서</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css" />
+    <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.10.5/favicon-32x32.png" sizes="32x32" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin:0;
+            background: #fafafa;
+        }
+
+        .swagger-ui .topbar {
+            background-color: #2c3e50;
+        }
+
+        .swagger-ui .topbar .download-url-wrapper .select-label {
+            color: #34495e;
+        }
+
+        .custom-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .custom-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .custom-header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .api-info {
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .server-info {
+            background: #ecf0f1;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="custom-header">
+        <h1>🌾 HDMS API</h1>
+        <p>하베스팅 데이터 모니터링 시스템 REST API 문서</p>
+    </div>
+
+    <div class="api-info">
+        <h2>📋 API 정보</h2>
+        <p><strong>버전:</strong> 1.0.0</p>
+        <p><strong>설명:</strong> 하베스팅 센서 데이터 모니터링 시스템의 REST API입니다.</p>
+        
+        <h3>🔗 서버 정보</h3>
+        <div class="server-info">
+            <strong>개발 서버:</strong> http://localhost:8080/api
+        </div>
+        <div class="server-info">
+            <strong>운영 서버:</strong> https://api.hdms.com/api
+        </div>
+
+        <h3>🔐 인증 방식</h3>
+        <p>JWT Bearer Token을 사용합니다. Authorization 헤더에 "Bearer {token}" 형식으로 전송해주세요.</p>
+        
+        <h3>📞 연락처</h3>
+        <p><strong>팀:</strong> HDMS Team</p>
+        <p><strong>이메일:</strong> admin@hdms.com</p>
+    </div>
+
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            // Build a system
+            const ui = SwaggerUIBundle({
+                url: './api-docs.yaml',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                validatorUrl: null,
+                supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+                onComplete: function() {
+                    console.log("Swagger UI loaded successfully");
+                },
+                onFailure: function(data) {
+                    console.error("Failed to load Swagger UI", data);
+                },
+                docExpansion: "list",
+                jsonEditor: false,
+                defaultModelRendering: 'schema',
+                showRequestHeaders: true,
+                showCommonExtensions: true,
+                syntaxHighlight: {
+                    activated: true,
+                    theme: "agate"
+                }
+            });
+
+            // 커스텀 로고 및 제목 설정
+            setTimeout(function() {
+                const topbar = document.querySelector('.topbar');
+                if (topbar) {
+                    topbar.style.display = 'none';
+                }
+            }, 100);
+        };
+    </script>
+</body>
+</html> 
