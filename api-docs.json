@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "HDMS 하베스팅 데이터 모니터링 시스템 API",
-    "description": "하베스팅 센서 데이터 모니터링 시스템의 REST API 문서입니다.",
+    "description": "하베스팅 센서 데이터 모니터링 시스템의 REST API 문서입니다.\n\n## 주요 기능\n- 🔐 사용자 인증 및 권한 관리\n- 👥 사용자 관리 (CRUD)\n- 📊 센서 데이터 모니터링\n- 🏢 시설 관리\n- 📈 통계 및 분석\n- 🚨 알림 관리\n\n## 인증 방식\nJWT Bearer Token을 사용합니다. 로그인 후 받은 토큰을 모든 요청의 Authorization 헤더에 포함해야 합니다.\n\n예시: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`\n",
     "contact": {
       "name": "HDMS Team",
       "email": "admin@hdms.com"
@@ -25,7 +25,7 @@
   ],
   "security": [
     {
-      "Bearer Authentication": []
+      "bearerAuth": []
     }
   ],
   "tags": [
@@ -36,6 +36,10 @@
     {
       "name": "사용자 관리",
       "description": "관리자 전용 사용자 관리 API (CRUD 및 권한 관리)"
+    },
+    {
+      "name": "테스트 도구",
+      "description": "개발 및 디버깅용 테스트 API"
     }
   ],
   "paths": {
@@ -44,25 +48,47 @@
         "tags": [
           "사용자 관리"
         ],
+        "summary": "사용자 활성화/비활성화 토글",
+        "description": "특정 사용자의 활성화 상태를 토글합니다. (관리자 권한 필요)",
         "operationId": "toggleUserStatus",
         "parameters": [
           {
             "name": "userId",
             "in": "path",
+            "description": "상태를 변경할 사용자의 ID",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
+            },
+            "example": 1
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
+          "404": {
+            "description": "사용자를 찾을 수 없음",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음 - 관리자만 접근 가능",
+            "content": {
+              "application/json": {
+
+              }
+            }
+          },
+          "200": {
+            "description": "사용자 상태 변경 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
                 }
               }
             }
@@ -70,7 +96,7 @@
         },
         "security": [
           {
-            "Bearer Authentication": []
+            "bearerAuth": []
           }
         ]
       }
@@ -107,16 +133,16 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "사용자를 찾을 수 없음",
+          "403": {
+            "description": "권한 없음 - 관리자만 접근 가능",
             "content": {
               "application/json": {
 
               }
             }
           },
-          "403": {
-            "description": "권한 없음 - 관리자만 접근 가능",
+          "404": {
+            "description": "사용자를 찾을 수 없음",
             "content": {
               "application/json": {
 
@@ -136,7 +162,7 @@
         },
         "security": [
           {
-            "Bearer Authentication": []
+            "bearerAuth": []
           }
         ]
       }
@@ -182,6 +208,16 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "로그인 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "로그인 실패 - 잘못된 인증 정보",
             "content": {
@@ -191,16 +227,6 @@
                 },
                 "example": {
                   "message": "로그인에 실패했습니다. 사용자 ID/이메일 또는 비밀번호를 확인해주세요."
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "로그인 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
                 }
               }
             }
@@ -227,16 +253,16 @@
         "description": "시스템에 등록된 모든 사용자의 목록을 조회합니다. (관리자 권한 필요)",
         "operationId": "getAllUsers",
         "responses": {
-          "500": {
-            "description": "서버 오류",
+          "403": {
+            "description": "권한 없음 - 관리자만 접근 가능",
             "content": {
               "application/json": {
 
               }
             }
           },
-          "403": {
-            "description": "권한 없음 - 관리자만 접근 가능",
+          "500": {
+            "description": "서버 오류",
             "content": {
               "application/json": {
 
@@ -259,7 +285,7 @@
         },
         "security": [
           {
-            "Bearer Authentication": []
+            "bearerAuth": []
           }
         ]
       },
@@ -281,6 +307,24 @@
           "required": true
         },
         "responses": {
+          "403": {
+            "description": "권한 없음 - 관리자만 접근 가능",
+            "content": {
+              "application/json": {
+
+              }
+            }
+          },
+          "200": {
+            "description": "사용자 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "잘못된 요청 - 중복된 사용자 ID/이메일 또는 유효성 검사 실패",
             "content": {
@@ -304,29 +348,11 @@
                 }
               }
             }
-          },
-          "200": {
-            "description": "사용자 생성 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "권한 없음 - 관리자만 접근 가능",
-            "content": {
-              "application/json": {
-
-              }
-            }
           }
         },
         "security": [
           {
-            "Bearer Authentication": []
+            "bearerAuth": []
           }
         ]
       }
@@ -334,27 +360,32 @@
     "/test/encode-password": {
       "get": {
         "tags": [
-          "test-controller"
+          "테스트 도구"
         ],
+        "summary": "비밀번호 암호화",
+        "description": "평문 비밀번호를 BCrypt로 암호화하여 반환합니다. (개발용)",
         "operationId": "encodePassword",
         "parameters": [
           {
             "name": "password",
             "in": "query",
+            "description": "암호화할 평문 비밀번호",
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "example": "admin123!"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "암호화된 비밀번호 반환",
             "content": {
-              "*/*": {
+              "text/plain": {
                 "schema": {
                   "type": "string"
-                }
+                },
+                "example": "$2a$10$XYZ123..."
               }
             }
           }
@@ -382,8 +413,8 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "인증되지 않은 요청",
+          "400": {
+            "description": "사용자 정보를 찾을 수 없음",
             "content": {
               "application/json": {
                 "schema": {
@@ -402,8 +433,8 @@
               }
             }
           },
-          "400": {
-            "description": "사용자 정보를 찾을 수 없음",
+          "401": {
+            "description": "인증되지 않은 요청",
             "content": {
               "application/json": {
                 "schema": {
@@ -415,7 +446,7 @@
         },
         "security": [
           {
-            "Bearer Authentication": []
+            "bearerAuth": []
           }
         ]
       }
@@ -442,11 +473,13 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "사용자를 찾을 수 없음",
+          "200": {
+            "description": "사용자 조회 성공",
             "content": {
               "application/json": {
-
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
               }
             }
           },
@@ -458,20 +491,18 @@
               }
             }
           },
-          "200": {
-            "description": "사용자 조회 성공",
+          "404": {
+            "description": "사용자를 찾을 수 없음",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserResponse"
-                }
+
               }
             }
           }
         },
         "security": [
           {
-            "Bearer Authentication": []
+            "bearerAuth": []
           }
         ]
       },
@@ -479,33 +510,55 @@
         "tags": [
           "사용자 관리"
         ],
+        "summary": "사용자 삭제",
+        "description": "특정 사용자를 시스템에서 완전히 삭제합니다. (관리자 권한 필요)",
         "operationId": "deleteUser",
         "parameters": [
           {
             "name": "userId",
             "in": "path",
+            "description": "삭제할 사용자의 ID",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
+            },
+            "example": 1
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
+          "404": {
+            "description": "사용자를 찾을 수 없음",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
+              }
+            }
+          },
+          "200": {
+            "description": "사용자 삭제 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "권한 없음 - 관리자만 접근 가능",
+            "content": {
+              "application/json": {
+
               }
             }
           }
         },
         "security": [
           {
-            "Bearer Authentication": []
+            "bearerAuth": []
           }
         ]
       }
@@ -513,6 +566,14 @@
   },
   "components": {
     "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
       "MenuPermissionsDto": {
         "type": "object",
         "properties": {
@@ -569,43 +630,63 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int32"
+            "description": "사용자 고유 ID",
+            "format": "int32",
+            "example": 1
           },
           "userId": {
-            "type": "string"
+            "type": "string",
+            "description": "사용자 로그인 ID",
+            "example": "testuser"
           },
           "username": {
-            "type": "string"
+            "type": "string",
+            "description": "사용자명",
+            "example": "테스트 사용자"
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "이메일 주소",
+            "example": "test@hdms.com"
           },
           "role": {
             "type": "integer",
-            "format": "int32"
+            "description": "사용자 역할 (1: 관리자, 2: 빌딩 관리자, 3: 배전반 관리자, 4: 조회자)",
+            "format": "int32",
+            "example": 2
           },
           "roleDescription": {
-            "type": "string"
+            "type": "string",
+            "description": "역할 설명",
+            "example": "빌딩관리자"
           },
           "buildingId": {
             "type": "integer",
-            "format": "int32"
+            "description": "건물 ID",
+            "format": "int32",
+            "example": 1
           },
           "boardId": {
             "type": "integer",
-            "format": "int32"
+            "description": "배전반 ID",
+            "format": "int32",
+            "example": 1
           },
           "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "활성화 상태",
+            "example": true
           },
           "createdAt": {
             "type": "string",
+            "description": "계정 생성 일시",
             "format": "date-time"
           },
           "menuPermissions": {
             "$ref": "#/components/schemas/MenuPermissionsDto"
           }
-        }
+        },
+        "description": "사용자 정보 응답"
       },
       "SuccessResponse": {
         "type": "object",
@@ -634,14 +715,6 @@
           }
         },
         "description": "로그인 요청 정보"
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        }
       },
       "LoginResponse": {
         "type": "object",
@@ -835,8 +908,9 @@
       }
     },
     "securitySchemes": {
-      "Bearer Authentication": {
+      "bearerAuth": {
         "type": "http",
+        "description": "JWT 토큰을 Authorization 헤더에 포함해주세요. 형식: Bearer {token}",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
